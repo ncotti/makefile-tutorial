@@ -14,7 +14,7 @@ Capabilities:
 * Generation of disassembly for each file.
 * Automatic documentation of targets with double numeral ## comments.
 
-You can try the Makefile with the sample sources in this repository (although it won't run).
+You can try the Makefile with the sample sources in this repository (although the executable probably won't run).
 
 The following sections explain how a Makefile may be built from scratch and serve as a quick remainder and tutorial.
 
