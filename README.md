@@ -1,6 +1,6 @@
 # Makefile Tutorial
 
-The Makefile in this repository serves as a template for any project built with C and Assembly in mind. Simply copy and paste the Makefile in the root of your project, and modify the variables in the section `User modifiable variables`. You may also modify the targets under the `User targets` section or create new ones for further customization.
+Makefile template for C and Assembly projects. Simply copy and paste the Makefile in your project, and modify the variables in the section `User modifiable variables` inside the file. You may also modify the targets under the `User targets` section or create new ones for further customization.
 
 Capabilities:
 
@@ -16,7 +16,7 @@ Capabilities:
 
 You can try the Makefile with the sample sources in this repository (although it won't run).
 
-The following sections explain how a Makefile may be built from scratch and serve as a tutorial.
+The following sections explain how a Makefile may be built from scratch and serve as a quick remainder and tutorial.
 
 ## What is a Makefile
 
