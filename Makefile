@@ -179,7 +179,7 @@ ${elf_file}: ${object_files}
 	echo "Executable file \"$@\" successfully created."
 
 # Compiling individual object files 
-${build_dir}/%${obj_ext}: %.* ${header_files} Makefile
+${build_dir}/%${obj_ext}: %.* ${header_files} Makefile ${linker_script}
 	# Create compilation folders if they don't exist
 	for dir in ${source_dirs}; do
 		mkdir -p ${build_dir}/$${dir}
