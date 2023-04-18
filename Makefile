@@ -18,8 +18,8 @@ SHELL=/bin/bash
 # arm-none-eabi, arm-linux-gnueabihf, (left empty), etc
 toolchain := arm-none-eabi
 
-# User specific flags for C compiler.
-compiler_flags := -c -Wall
+# User specific flags for C compiler (implicit flags: -c)
+compiler_flags := -Wall
 
 # User specific flags for Assembler
 assembler_flags := 
@@ -27,7 +27,7 @@ assembler_flags :=
 # Direction to the linker script (can be empty)
 linker_script := 
 
-# User specific linker flags.
+# User specific linker flags (implicit flags: -Map).
 linker_flags := 
 
 # List of header files' directories (don't use "./").
@@ -73,6 +73,7 @@ build_dir	:= build
 info_dir 	:= info
 elf_file 	:= ${build_dir}/${executable_name}${elf_ext}
 bin_file 	:= ${build_dir}/${executable_name}${bin_ext}
+map_file	:= ${build_dir}/${info_dir}/memory.map
 
 # List all C source files as "source_dir/source_file"
 define c_source_files !=
@@ -173,8 +174,8 @@ ${elf_file}: ${object_files}
 	if [ -n "${linker_script}" ]; then
 		script="-T ${linker_script}"
 	fi
-
-	${linker} ${linker_flags} $${script} -o $@ $^
+	mkdir -p ${build_dir}/${info_dir}
+	${linker} ${linker_flags} $${script} -o $@ $^ -Map ${map_file}
 	${print_checkmark}
 	echo "Executable file \"$@\" successfully created."
 
