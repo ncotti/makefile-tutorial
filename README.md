@@ -1,6 +1,6 @@
 # Makefile Tutorial
 
-Makefile template for C and Assembly projects. Simply copy and paste the Makefile in your project, and modify the variables in the section `User modifiable variables` inside the file. You may also modify the targets under the `User targets` section or create new ones for further customization.
+Makefile template for C and Assembly projects. Simply copy and paste the Makefile in your project, and modify the variables in the section `User modifiable variables` inside the file. You may also modify the targets under the `User targets` section or create new ones for further customization (specially the **run**, **kill** and **debug** targets).
 
 Capabilities:
 

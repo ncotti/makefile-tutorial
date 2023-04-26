@@ -16,19 +16,19 @@ SHELL=/bin/bash
 #------------------------------------------------------------------------------
 # Which compiler, linker, assembler and binutils to use, e.g.:
 # arm-none-eabi, arm-linux-gnueabihf, (left empty), etc
-toolchain := arm-none-eabi
+toolchain := arm-linux-gnueabihf
 
 # User specific flags for C compiler (implicit flags: -c)
-compiler_flags := -Wall
+compiler_flags := -Wall -g
 
 # User specific flags for Assembler
-assembler_flags := 
+assembler_flags := -g
 
 # Direction to the linker script (can be empty)
-linker_script := 
+linker_script := linker_script.ld
 
 # User specific linker flags (implicit flags: -Map).
-linker_flags := 
+linker_flags := -g
 
 # List of header files' directories (don't use "./").
 header_dirs := inc inc/sub_inc
@@ -37,7 +37,10 @@ header_dirs := inc inc/sub_inc
 source_dirs := src src/sub_src
 
 # Name of the final executable (without extension)
-executable_name := exe
+executable_name := a
+
+# Name of the gdb script (can be empty)
+gdb_script := debug.gdb
 
 #------------------------------------------------------------------------------
 # Binutils 
@@ -78,21 +81,27 @@ map_file	:= ${build_dir}/${info_dir}/memory.map
 # List all C source files as "source_dir/source_file"
 define c_source_files !=
 	for dir in ${source_dirs}; do
-		ls $${dir}/*${c_ext} 2> /dev/null
+		if ls $${dir}/*${c_ext} 2> /dev/null; then
+			ls $${dir}/*${c_ext} 2> /dev/null
+		fi
 	done
 endef
 
 # List all assembly source files as "source_dir/source_file"
 define asm_source_files !=
 	for dir in ${source_dirs}; do
-		ls $${dir}/*${asm_ext} 2> /dev/null
+		if ls $${dir}/*${asm_ext} 2> /dev/null; then
+			ls $${dir}/*${asm_ext} 2> /dev/null
+		fi
 	done
 endef
 
 # List all header files as "header_dir/header_file"
 define header_files !=
 	for dir in ${header_dirs}; do
-		ls $${dir}/*${h_ext} 2> /dev/null
+		if ls $${dir}/*${h_ext} 2> /dev/null; then
+			ls $${dir}/*${asm_ext} 2> /dev/null
+		fi
 	done
 endef
 
@@ -161,13 +170,42 @@ clean: ## Erase contents of build directory.
 clear: clean ## Same as clean.
 
 .PHONY: run
-run: ${elf_file} ## Execute compiled program.
-	./$<
+run: ${bin_file} kill ## Execute compiled program (using QEMU)
+	echo -n "Initiating Qemu... "
+	coproc qemu-system-arm \
+		-M realview-pb-a8 \
+		-m 32M \
+		-no-reboot -nographic \
+		-monitor telnet:127.0.0.1:1234,server,nowait \
+		-S -gdb tcp::2159 \
+		-kernel ${bin_file} &>/dev/null
+	${print_checkmark}
+
+.PHONY: kill
+kill: ## Stop qemu process running on background
+	# Send SIGKILL to coproc qemu if running
+	if ps | grep "qemu" &>/dev/null; then
+		echo -n "Old qemu process running on background. Killing... "
+		# Get the line where "qemu" is
+		qemu_line=$$( ps | grep "qemu" )
+		# Get only the first numbers (PID)
+		qemu_pid=$$( echo "$${qemu_line}" | grep -P -o '^[^\d]*\d+')
+		# Remove prefixing spaces or non digits
+		qemu_pid=$$( echo "$${qemu_pid}" | grep -P -o '\d+')
+		kill "$${qemu_pid}"
+		${print_checkmark}
+	fi
+	
+.PHONY: debug
+debug: run ## Debug the program (no need to "make run" first, compile with "-g")
+	if [ -n "${gdb_script}" ]; then
+		arg_gdb_script="-x ${gdb_script}"
+	fi
+	gdb-multiarch -q $${arg_gdb_script} "${elf_file}"
 
 #------------------------------------------------------------------------------
 # Compilation targets
 #------------------------------------------------------------------------------
-
 # Main executable linking
 ${elf_file}: ${object_files}
 	echo -n "Linking everything together... "
@@ -204,7 +242,6 @@ ${build_dir}/%${obj_ext}: %.* ${header_files} Makefile ${linker_script}
 		echo "Unrecognized file extension."
 		exit 1
 	fi
-	
 	${print_checkmark}
 
 # Print object files' headers
