@@ -184,10 +184,10 @@ run: ${bin_file} kill ## Execute compiled program (using QEMU)
 .PHONY: kill
 kill: ## Stop qemu process running on background
 	# Send SIGKILL to coproc qemu if running
-	if ps | grep "qemu" &>/dev/null; then
+	if ps -e | grep "qemu" &>/dev/null; then
 		echo -n "Old qemu process running on background. Killing... "
 		# Get the line where "qemu" is
-		qemu_line=$$( ps | grep "qemu" )
+		qemu_line=$$( ps -e | grep "qemu" )
 		# Get only the first numbers (PID)
 		qemu_pid=$$( echo "$${qemu_line}" | grep -P -o '^[^\d]*\d+')
 		# Remove prefixing spaces or non digits
