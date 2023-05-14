@@ -30,10 +30,10 @@ linker_script := linker_script.ld
 # User specific linker flags (implicit flags: -Map).
 linker_flags := -g
 
-# List of header files' directories (don't use "./").
+# List of header files' directories.
 header_dirs := inc inc/sub_inc
 
-# List of source files' directories (don't use "./")
+# List of source files' directories.
 source_dirs := src src/sub_src
 
 # Name of the final executable (without extension)
@@ -43,7 +43,7 @@ executable_name := a
 gdb_script := debug.gdb
 
 #------------------------------------------------------------------------------
-# Binutils 
+# Binutils
 #------------------------------------------------------------------------------
 cc 			:= ${toolchain}-gcc
 as 			:= ${toolchain}-as
@@ -152,12 +152,15 @@ binary: ${bin_file} ## Generate binary file, without ELF headers.
 .PHONY: headers
 headers: ${object_header_files} ## Generate symbol table and section headers for all object files.
 
-.PHONY: dasm 
+.PHONY: dasm
 dasm: ${dasm_files} ## Generate disassemble for all object files and elf file.
 
 .PHONY: clean
 clean: ## Erase contents of build directory.
 	if [ -d $${build_dir} ]; then
+		if [ -d $${build_dir}/$${info_dir} ]; then
+			rm -R $${build_dir}/$${info_dir}
+		fi
 		rm -R $${build_dir}
 		echo -n "All files successfully erased "
 		${print_checkmark}
@@ -195,7 +198,7 @@ kill: ## Stop qemu process running on background
 		kill "$${qemu_pid}"
 		${print_checkmark}
 	fi
-	
+
 .PHONY: debug
 debug: run ## Debug the program (no need to "make run" first, compile with "-g")
 	if [ -n "${gdb_script}" ]; then
@@ -217,7 +220,7 @@ ${elf_file}: ${object_files}
 	${print_checkmark}
 	echo "Executable file \"$@\" successfully created."
 
-# Compiling individual object files 
+# Compiling individual object files
 ${build_dir}/%${obj_ext}: %.* ${header_files} Makefile ${linker_script}
 	# Create compilation folders if they don't exist
 	for dir in ${source_dirs}; do
@@ -229,7 +232,7 @@ ${build_dir}/%${obj_ext}: %.* ${header_files} Makefile ${linker_script}
 	for dir in ${header_dirs}; do
 		include_headers="$${include_headers} -I $${dir}"
 	done
-	
+
 	# Actual compiling
 	if echo $< | grep "\${c_ext}" &>/dev/null; then
 		echo -n "Compiling $< --> $@... "
