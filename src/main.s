@@ -1,6 +1,7 @@
 .global _start
 .extern _stack_addr
 .extern add9
+.include "asm_header.s"
 
 .text
 _start:
@@ -10,7 +11,7 @@ _start:
     mov r2, #3
     mov r3, #4
     mov r4, #5
-    mov r5, #6
+    ldr r5, =sixth_arg
     mov r6, #7
     mov r7, #8
     mov r8, #9

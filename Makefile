@@ -81,7 +81,7 @@ map_file	:= ${build_dir}/${info_dir}/memory.map
 # List all C source files as "source_dir/source_file"
 define c_source_files !=
 	for dir in ${source_dirs}; do
-		if ls $${dir}/*${c_ext} 2> /dev/null; then
+		if ls $${dir}/*${c_ext} &> /dev/null; then
 			ls $${dir}/*${c_ext} 2> /dev/null
 		fi
 	done
@@ -90,7 +90,7 @@ endef
 # List all assembly source files as "source_dir/source_file"
 define asm_source_files !=
 	for dir in ${source_dirs}; do
-		if ls $${dir}/*${asm_ext} 2> /dev/null; then
+		if ls $${dir}/*${asm_ext} &> /dev/null; then
 			ls $${dir}/*${asm_ext} 2> /dev/null
 		fi
 	done
@@ -99,7 +99,10 @@ endef
 # List all header files as "header_dir/header_file"
 define header_files !=
 	for dir in ${header_dirs}; do
-		if ls $${dir}/*${h_ext} 2> /dev/null; then
+		if ls $${dir}/*${h_ext} &> /dev/null; then
+			ls $${dir}/*${h_ext} 2> /dev/null
+		fi
+		if ls $${dir}/*${asm_ext} &> /dev/null; then
 			ls $${dir}/*${asm_ext} 2> /dev/null
 		fi
 	done
